@@ -5,7 +5,7 @@ using System.IO;
 // MesaPartes_OkeyMusic_EF.cs - EF semana 15 - CIIN1205P
 // Mesa de partes de la tienda Okey Music.
 // Punto de partida: la version final del EP (7 opciones).
-// Mejoras EF 1 y 2: cambiar estado y anular documento (9 opciones).
+// Mejoras EF 1 a 3: cambiar estado, anular y estadisticas (10 opciones).
 // ============================================================
 class Program
 {
@@ -30,9 +30,9 @@ class Program
         {
             MostrarMenu();
             string entrada = Console.ReadLine();
-            while (!int.TryParse(entrada, out opcion) || opcion < 1 || opcion > 9)
+            while (!int.TryParse(entrada, out opcion) || opcion < 1 || opcion > 10)
             {
-                Console.Write("Dato no valido. Ingrese del 1 al 9: ");
+                Console.Write("Dato no valido. Ingrese del 1 al 10: ");
                 entrada = Console.ReadLine();
             }
             switch (opcion)
@@ -45,16 +45,17 @@ class Program
                 case 6: VerTotal(); break;
                 case 7: CambiarEstado(); break;
                 case 8: AnularExpediente(); break;
-                case 9: Console.WriteLine("Guardando archivo y saliendo..."); break;
+                case 9: Estadisticas(); break;
+                case 10: Console.WriteLine("Guardando archivo y saliendo..."); break;
                 default: Console.WriteLine("Opcion no valida."); break;
             }
-            if (opcion != 9 && !Console.IsInputRedirected)
+            if (opcion != 10 && !Console.IsInputRedirected)
             {
                 Console.WriteLine("\nPresione cualquier tecla para continuar...");
                 try { Console.ReadKey(true); } catch { Console.ReadLine(); }
                 Console.Clear();
             }
-        } while (opcion != 9);
+        } while (opcion != 10);
     }
 
     static void MostrarMenu()
@@ -68,7 +69,8 @@ class Program
         Console.WriteLine("6. Ver total registrados");
         Console.WriteLine("7. Cambiar estado del documento");
         Console.WriteLine("8. Anular documento");
-        Console.WriteLine("9. Salir y guardar");
+        Console.WriteLine("9. Estadisticas por tipo y estado");
+        Console.WriteLine("10. Salir y guardar");
         Console.WriteLine("========================================");
         Console.Write("Elija opcion: ");
     }
@@ -348,6 +350,33 @@ class Program
         codigos[totalExp] = null; dnis[totalExp] = null;
         nombres[totalExp] = null; asuntos[totalExp] = null;
         tipos[totalExp] = null; estados[totalExp] = null;
+    }
+
+    // ---- MEJORA EF 3: estadisticas por tipo y estado ----
+    static void Estadisticas()
+    {
+        Console.WriteLine("\n--- ESTADISTICAS ---");
+        if (totalExp == 0)
+        {
+            Console.WriteLine("Aun no hay documentos.");
+            return;
+        }
+        int g = 0, r = 0, p = 0, s = 0;
+        int reg = 0, proc = 0, at = 0;
+        for (int i = 0; i < totalExp; i++)
+        {
+            if (tipos[i] == "Garantia") g++;
+            else if (tipos[i] == "Reclamo") r++;
+            else if (tipos[i] == "Pedido") p++;
+            else if (tipos[i] == "Solicitud") s++;
+
+            if (estados[i] == "Registrado") reg++;
+            else if (estados[i] == "En proceso") proc++;
+            else if (estados[i] == "Atendido") at++;
+        }
+        Console.WriteLine("Total documentos: " + totalExp);
+        Console.WriteLine("Por tipo   -> Garantia: " + g + " | Reclamo: " + r + " | Pedido: " + p + " | Solicitud: " + s);
+        Console.WriteLine("Por estado -> Registrado: " + reg + " | En proceso: " + proc + " | Atendido: " + at);
     }
 
     static void Guardar()
