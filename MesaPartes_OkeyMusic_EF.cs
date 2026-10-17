@@ -4,8 +4,14 @@ using System.IO;
 // ============================================================
 // MesaPartes_OkeyMusic_EF.cs - EF semana 15 - CIIN1205P
 // Mesa de partes de la tienda Okey Music.
-// Punto de partida: la version final del EP (7 opciones).
-// Mejoras EF 1 a 3: cambiar estado, anular y estadisticas (10 opciones).
+// VERSION FINAL: registra, valida, busca, ordena, guarda,
+// cambia el estado, anula documentos y muestra estadisticas.
+// Alcance EF: 10 opciones, 7 arreglos paralelos, 1 archivo.
+// MEJORAS sobre el EP:
+//   (1) cambiar el estado del documento (Registrado/En proceso/Atendido)
+//   (2) anular (eliminar) un documento mal registrado
+//   (3) estadisticas: conteo por tipo y por estado
+//   (4) la lista ahora muestra el estado de cada documento
 // ============================================================
 class Program
 {
@@ -162,14 +168,14 @@ class Program
             Console.WriteLine("\nAun no hay documentos.");
             return;
         }
-        Console.WriteLine("\nCODIGO   | FECHA             | DOC      | CLIENTE/PROV.        | TIPO       | ASUNTO");
-        Console.WriteLine(new string('-', 100));
+        Console.WriteLine("\nCODIGO   | FECHA             | DOC      | CLIENTE/PROV.        | TIPO       | ASUNTO                    | ESTADO");
+        Console.WriteLine(new string('-', 120));
         for (int i = 0; i < totalExp; i++)
         {
             string nom = nombres[i].Length > 20 ? nombres[i].Substring(0, 17) + "..." : nombres[i];
-            string asu = asuntos[i].Length > 28 ? asuntos[i].Substring(0, 25) + "..." : asuntos[i];
-            Console.WriteLine(string.Format("{0,-8} | {1,-17} | {2,-8} | {3,-20} | {4,-10} | {5}",
-                codigos[i], fechas[i].ToString("yyyy-MM-dd HH:mm"), dnis[i], nom, tipos[i], asu));
+            string asu = asuntos[i].Length > 30 ? asuntos[i].Substring(0, 27) + "..." : asuntos[i];
+            Console.WriteLine(string.Format("{0,-8} | {1,-17} | {2,-8} | {3,-20} | {4,-10} | {5,-30} | {6}",
+                codigos[i], fechas[i].ToString("yyyy-MM-dd HH:mm"), dnis[i], nom, tipos[i], asu, estados[i]));
         }
     }
 
