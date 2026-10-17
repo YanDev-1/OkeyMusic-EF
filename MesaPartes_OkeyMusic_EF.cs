@@ -5,7 +5,7 @@ using System.IO;
 // MesaPartes_OkeyMusic_EF.cs - EF semana 15 - CIIN1205P
 // Mesa de partes de la tienda Okey Music.
 // Punto de partida: la version final del EP (7 opciones).
-// Mejora EF 1: cambiar el estado del documento (8 opciones).
+// Mejoras EF 1 y 2: cambiar estado y anular documento (9 opciones).
 // ============================================================
 class Program
 {
@@ -30,9 +30,9 @@ class Program
         {
             MostrarMenu();
             string entrada = Console.ReadLine();
-            while (!int.TryParse(entrada, out opcion) || opcion < 1 || opcion > 8)
+            while (!int.TryParse(entrada, out opcion) || opcion < 1 || opcion > 9)
             {
-                Console.Write("Dato no valido. Ingrese del 1 al 8: ");
+                Console.Write("Dato no valido. Ingrese del 1 al 9: ");
                 entrada = Console.ReadLine();
             }
             switch (opcion)
@@ -44,16 +44,17 @@ class Program
                 case 5: OrdenarExpedientes(); break;
                 case 6: VerTotal(); break;
                 case 7: CambiarEstado(); break;
-                case 8: Console.WriteLine("Guardando archivo y saliendo..."); break;
+                case 8: AnularExpediente(); break;
+                case 9: Console.WriteLine("Guardando archivo y saliendo..."); break;
                 default: Console.WriteLine("Opcion no valida."); break;
             }
-            if (opcion != 8 && !Console.IsInputRedirected)
+            if (opcion != 9 && !Console.IsInputRedirected)
             {
                 Console.WriteLine("\nPresione cualquier tecla para continuar...");
                 try { Console.ReadKey(true); } catch { Console.ReadLine(); }
                 Console.Clear();
             }
-        } while (opcion != 8);
+        } while (opcion != 9);
     }
 
     static void MostrarMenu()
@@ -66,7 +67,8 @@ class Program
         Console.WriteLine("5. Ordenar documentos");
         Console.WriteLine("6. Ver total registrados");
         Console.WriteLine("7. Cambiar estado del documento");
-        Console.WriteLine("8. Salir y guardar");
+        Console.WriteLine("8. Anular documento");
+        Console.WriteLine("9. Salir y guardar");
         Console.WriteLine("========================================");
         Console.Write("Elija opcion: ");
     }
@@ -303,6 +305,49 @@ class Program
         if (t == 1) return "En proceso";
         if (t == 2) return "Atendido";
         return "Registrado";
+    }
+
+    // ---- MEJORA EF 2: anular (eliminar) un documento ----
+    static void AnularExpediente()
+    {
+        Console.WriteLine("\n--- ANULAR DOCUMENTO ---");
+        Console.Write("Codigo a anular (ej. EXP-0001): ");
+        string b = Console.ReadLine().Trim().ToUpper();
+        int pos = PosCodigo(b);
+        if (pos == -1)
+        {
+            Console.WriteLine("No existe documento con ese codigo.");
+            return;
+        }
+        Console.WriteLine("Se anulara: " + codigos[pos] + " | " + nombres[pos] + " | " + asuntos[pos]);
+        Console.Write("Confirma? (S/N): ");
+        string resp = Console.ReadLine().Trim().ToUpper();
+        if (resp != "S")
+        {
+            Console.WriteLine("Operacion cancelada.");
+            return;
+        }
+        Eliminar(pos);
+        Guardar();
+        Console.WriteLine("Documento " + b + " anulado y retirado de la lista.");
+    }
+
+    static void Eliminar(int pos)
+    {
+        for (int i = pos; i < totalExp - 1; i++)
+        {
+            codigos[i] = codigos[i + 1];
+            dnis[i] = dnis[i + 1];
+            nombres[i] = nombres[i + 1];
+            asuntos[i] = asuntos[i + 1];
+            tipos[i] = tipos[i + 1];
+            fechas[i] = fechas[i + 1];
+            estados[i] = estados[i + 1];
+        }
+        totalExp--;
+        codigos[totalExp] = null; dnis[totalExp] = null;
+        nombres[totalExp] = null; asuntos[totalExp] = null;
+        tipos[totalExp] = null; estados[totalExp] = null;
     }
 
     static void Guardar()
