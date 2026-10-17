@@ -5,7 +5,7 @@ using System.IO;
 // MesaPartes_OkeyMusic_EF.cs - EF semana 15 - CIIN1205P
 // Mesa de partes de la tienda Okey Music.
 // Punto de partida: la version final del EP (7 opciones).
-// En los siguientes commits se agregan las mejoras de la EF.
+// Mejora EF 1: cambiar el estado del documento (8 opciones).
 // ============================================================
 class Program
 {
@@ -30,9 +30,9 @@ class Program
         {
             MostrarMenu();
             string entrada = Console.ReadLine();
-            while (!int.TryParse(entrada, out opcion) || opcion < 1 || opcion > 7)
+            while (!int.TryParse(entrada, out opcion) || opcion < 1 || opcion > 8)
             {
-                Console.Write("Dato no valido. Ingrese del 1 al 7: ");
+                Console.Write("Dato no valido. Ingrese del 1 al 8: ");
                 entrada = Console.ReadLine();
             }
             switch (opcion)
@@ -43,16 +43,17 @@ class Program
                 case 4: BuscarParcial(); break;
                 case 5: OrdenarExpedientes(); break;
                 case 6: VerTotal(); break;
-                case 7: Console.WriteLine("Guardando archivo y saliendo..."); break;
+                case 7: CambiarEstado(); break;
+                case 8: Console.WriteLine("Guardando archivo y saliendo..."); break;
                 default: Console.WriteLine("Opcion no valida."); break;
             }
-            if (opcion != 7 && !Console.IsInputRedirected)
+            if (opcion != 8 && !Console.IsInputRedirected)
             {
                 Console.WriteLine("\nPresione cualquier tecla para continuar...");
                 try { Console.ReadKey(true); } catch { Console.ReadLine(); }
                 Console.Clear();
             }
-        } while (opcion != 7);
+        } while (opcion != 8);
     }
 
     static void MostrarMenu()
@@ -64,7 +65,8 @@ class Program
         Console.WriteLine("4. Buscar por cliente / asunto");
         Console.WriteLine("5. Ordenar documentos");
         Console.WriteLine("6. Ver total registrados");
-        Console.WriteLine("7. Salir y guardar");
+        Console.WriteLine("7. Cambiar estado del documento");
+        Console.WriteLine("8. Salir y guardar");
         Console.WriteLine("========================================");
         Console.Write("Elija opcion: ");
     }
@@ -267,6 +269,40 @@ class Program
     {
         Console.WriteLine("\nTotal documentos: " + totalExp);
         if (totalExp > 0) Console.WriteLine("Ultimo: " + codigos[totalExp - 1]);
+    }
+
+    // ---- MEJORA EF 1: cambiar el estado del documento ----
+    static void CambiarEstado()
+    {
+        Console.WriteLine("\n--- CAMBIAR ESTADO ---");
+        Console.Write("Codigo (ej. EXP-0001): ");
+        string b = Console.ReadLine().Trim().ToUpper();
+        int pos = PosCodigo(b);
+        if (pos == -1)
+        {
+            Console.WriteLine("No existe documento con ese codigo.");
+            return;
+        }
+        Console.WriteLine("Estado actual de " + codigos[pos] + ": " + estados[pos]);
+        estados[pos] = PedirEstado();
+        Guardar();
+        Console.WriteLine("Estado actualizado a: " + estados[pos] + ".");
+    }
+
+    static string PedirEstado()
+    {
+        Console.WriteLine("Nuevo estado: 1.En proceso  2.Atendido  3.Registrado");
+        Console.Write("Elija (1-3): ");
+        string e = Console.ReadLine().Trim();
+        int t;
+        while (!int.TryParse(e, out t) || t < 1 || t > 3)
+        {
+            Console.Write("No valido (1-3): ");
+            e = Console.ReadLine().Trim();
+        }
+        if (t == 1) return "En proceso";
+        if (t == 2) return "Atendido";
+        return "Registrado";
     }
 
     static void Guardar()
